@@ -33,6 +33,16 @@ All endpoints are prefixed with `/api`. Authentication is via Bearer token (Lara
 - Response: user object
 - Errors: 401 (invalid/missing token)
 
+#### POST `/auth/logout` (auth required)
+- Revoke the current access token (logout current device)
+- Response: `{ message }`
+- Errors: 401 (unauthenticated)
+
+#### POST `/auth/logout-all` (auth required)
+- Revoke all tokens for the authenticated user (logout from all devices)
+- Response: `{ message }`
+- Errors: 401 (unauthenticated)
+
 ### Leads
 
 #### GET `/leads` (auth required)
@@ -75,6 +85,51 @@ All endpoints are prefixed with `/api`. Authentication is via Bearer token (Lara
   - `lead_type` (string, optional)
   - `deal_value` (float, optional)
   - `meta` (object, optional)
+
+#### GET `/leads/{lead}` (auth required)
+- Get details for a specific lead
+- Response: lead object
+- Errors: 401 (unauthenticated), 404 (not found)
+
+#### PUT `/leads/{lead}` (auth required)
+- Update a lead (owner only)
+- Body: same as create
+- Response: `{ message }`
+- Errors: 401 (unauthenticated), 404 (not found), 422 (validation)
+
+#### DELETE `/leads/{lead}` (auth required)
+- Delete a lead (owner only)
+- Response: `{ message }`
+- Errors: 401 (unauthenticated), 404 (not found)
+
+### Lead Activities
+
+These endpoints help record notes, status changes, followups and call logs for a lead.
+
+#### GET `/leads/{lead}/activities` (auth required)
+- List activity entries for a lead (notes, status changes, followups, call logs)
+- Response: array of activity objects
+- Errors: 401 (unauthenticated), 404 (not found)
+
+#### POST `/leads/{lead}/note` (auth required)
+- Add a text note to a lead
+- Body: `{ note: string }`
+- Response: created activity object
+
+#### POST `/leads/{lead}/status` (auth required)
+- Change lead status
+- Body: `{ status: string }`
+- Response: created activity object
+
+#### POST `/leads/{lead}/followup` (auth required)
+- Schedule a followup for a lead
+- Body: `{ followup_at: string (ISO), note?: string }`
+- Response: created activity object
+
+#### POST `/leads/{lead}/call-log` (auth required)
+- Record a call log for a lead
+- Body: `{ duration_seconds: integer, note?: string, called_at?: string }`
+- Response: created activity object
 
 ### Workspaces
 

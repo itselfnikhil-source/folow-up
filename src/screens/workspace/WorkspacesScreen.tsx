@@ -8,6 +8,7 @@ export default function WorkspacesScreen({ navigation }: any) {
   const [workspaces, setWorkspaces] = useState<any[]>([]);
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
+  const [user, setUser] = useState<any>(null);
 
   const load = async () => {
     try {
@@ -20,11 +21,20 @@ export default function WorkspacesScreen({ navigation }: any) {
 
   useEffect(() => { load(); }, []);
 
+  useEffect(() => {
+    (async () => {
+      const u = await authService.getStoredUser();
+      setUser(u);
+      console.log('Stored user in WorkspacesScreen:', u);
+    })();
+  }, []);
+
   const onCreate = async () => {
     if (!name.trim()) return Alert.alert('Validation', 'Workspace name required');
     setCreating(true);
     try {
       const created = await authService.createWorkspace(name.trim());
+      console.log('Workspace created:', created);
       setName('');
       setCreating(false);
       await load();
@@ -41,13 +51,16 @@ export default function WorkspacesScreen({ navigation }: any) {
     <View style={styles.container}>
       <Text style={styles.header}>Workspaces</Text>
 
-      <Card style={{ marginBottom: 12 }}>
-        <Card.Content>
-          <Text style={{ marginBottom: 6 }}>Create a new workspace to organize leads and teams.</Text>
-          <TextInput placeholder="Workspace name" value={name} onChangeText={setName} style={{ marginBottom: 8 }} />
-          <Button mode="contained" onPress={onCreate} loading={creating}>Create Workspace</Button>
-        </Card.Content>
-      </Card>
+      {/* Only managers can create workspaces */}
+      {user?.role === 'manager' && (
+        <Card style={{ marginBottom: 12 }}>
+          <Card.Content>
+            <Text style={{ marginBottom: 6 }}>Create a new workspace to organize leads and teams.</Text>
+            <TextInput placeholder="Workspace name" value={name} onChangeText={setName} style={{ marginBottom: 8 }} />
+            <Button mode="contained" onPress={onCreate} loading={creating}>Create Workspace</Button>
+          </Card.Content>
+        </Card>
+      )}
 
       {workspaces.map((w) => (
         <List.Item

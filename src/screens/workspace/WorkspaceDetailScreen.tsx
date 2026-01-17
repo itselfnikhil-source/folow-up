@@ -7,6 +7,7 @@ export default function WorkspaceDetailScreen({ route, navigation }: any) {
   const { workspaceId } = route.params;
   const [members, setMembers] = useState<any[]>([]);
   const [email, setEmail] = useState('');
+  const [searchEmail, setSearchEmail] = useState('');
   const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(false);
 
@@ -34,12 +35,23 @@ export default function WorkspaceDetailScreen({ route, navigation }: any) {
     }
   };
 
+  const onSearch = () => {
+    // client-side filter; in real app we'd call user search API
+    const q = searchEmail.trim().toLowerCase();
+    const results = members.filter((m) => (m.email || '').toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q));
+    console.log('WorkspaceDetail search for', searchEmail, 'results:', results);
+    if (results.length === 0) Alert.alert('No matches found');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Workspace Members</Text>
 
       <Card style={{ marginBottom: 12 }}>
         <Card.Content>
+          <TextInput placeholder="Search member by name or email" value={searchEmail} onChangeText={setSearchEmail} style={{ marginBottom: 8 }} keyboardType="email-address" />
+          <Button mode="outlined" onPress={onSearch} style={{ marginBottom: 8 }}>Search</Button>
+
           <TextInput placeholder="Invite by email" value={email} onChangeText={setEmail} style={{ marginBottom: 8 }} keyboardType="email-address" />
           <Button mode="contained" onPress={onInvite} loading={loading}>Send Invite</Button>
         </Card.Content>

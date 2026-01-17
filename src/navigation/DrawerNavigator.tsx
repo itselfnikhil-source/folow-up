@@ -1,3 +1,8 @@
+import React from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import DashboardScreen from '../screens/DashboardScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import LeadsStack from './LeadsStack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
   DrawerContentScrollView,
@@ -5,14 +10,9 @@ import {
   DrawerContentComponentProps,
 } from '@react-navigation/drawer';
 import { View, Text, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-import DashboardScreen from '../screens/DashboardScreen';
-import LeadsStack from './LeadsStack';
-import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import WorkspaceInvitationsScreen from '../screens/workspace/WorkspaceInvitationsScreen';
-import ChangePasswordScreen from '../screens/auth/ChangePasswordScreen';
+import ChangePasswordScreen from '../screens/Auth/ChangePasswordScreen';
 import WorkspacesScreen from '../screens/workspace/WorkspacesScreen';
 import WorkspaceDetailScreen from '../screens/workspace/WorkspaceDetailScreen';
 import MemberLeadsScreen from '../screens/workspace/MemberLeadsScreen';
@@ -35,6 +35,14 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 }
 
 export default function DrawerNavigator() {
+  const [user, setUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    (async () => {
+      const u = await (await import('../services/authService')).default.getStoredUser();
+      setUser(u);
+    })();
+  }, []);
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -83,26 +91,22 @@ export default function DrawerNavigator() {
           ),
         }}
       />
-      <Drawer.Screen
-        name="Invitations"
-        component={WorkspaceInvitationsScreen}
-        options={{ drawerLabel: 'Invitations', drawerIcon: ({ color }) => (<MaterialCommunityIcons name="email" size={22} color={color} />) }}
-      />
-      <Drawer.Screen
-        name="Workspaces"
-        component={WorkspacesScreen}
-        options={{ drawerLabel: 'Workspaces', drawerIcon: ({ color }) => (<MaterialCommunityIcons name="office-building" size={22} color={color} />) }}
-      />
-      <Drawer.Screen
-        name="WorkspaceDetail"
-        component={WorkspaceDetailScreen}
-        options={{ drawerItemStyle: { height: 0 }, headerShown: true }}
-      />
-      <Drawer.Screen
-        name="MemberLeads"
-        component={MemberLeadsScreen}
-        options={{ drawerItemStyle: { height: 0 }, headerShown: true }}
-      />
+      {user?.role === 'member' && (
+        <Drawer.Screen
+          name="Invitations"
+          component={WorkspaceInvitationsScreen}
+          options={{ drawerLabel: 'Invitations', drawerIcon: ({ color }) => (<MaterialCommunityIcons name="email" size={22} color={color} />) }}
+        />
+      )}
+
+      {user?.role !== 'member' && (
+        <Drawer.Screen
+          name="Workspaces"
+          component={WorkspacesScreen}
+          options={{ drawerLabel: 'Workspaces', drawerIcon: ({ color }) => (<MaterialCommunityIcons name="office-building" size={22} color={color} />) }}
+        />
+      )}
+      {/* WorkspaceDetail and MemberLeads are handled in the MainStack to preserve back navigation */}
       <Drawer.Screen
         name="ChangePassword"
         component={ChangePasswordScreen}

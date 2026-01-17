@@ -313,4 +313,15 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 12,
   },
+  workspaceBanner: {
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+    flexDirection: 'column',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+  },
 });

@@ -79,8 +79,17 @@ class AuthService {
   }
 
   async logout() {
+    try {
+      // attempt server-side logout (token will be attached by interceptor)
+      await api.post('/auth/logout');
+    } catch (e) {
+      // ignore server errors — proceed to clear local state
+      console.warn('Server logout failed', e);
+    }
+
     await AsyncStorage.removeItem('authToken');
     await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('currentWorkspace');
   }
 
   async getStoredUser() {

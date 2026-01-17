@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { createLead } from '../../services/api';
 
@@ -41,10 +41,11 @@ export default function CreateLeadScreen({ navigation }: any) {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
-      <Text style={styles.header}>Create Lead</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        <Text style={styles.header}>Create Lead</Text>
 
-      <TextInput label="First name" value={firstName} onChangeText={setFirstName} style={styles.input} />
+        <TextInput label="First name" value={firstName} onChangeText={setFirstName} style={styles.input} />
       <TextInput label="Last name" value={lastName} onChangeText={setLastName} style={styles.input} />
       <TextInput label="Phone" value={phone} onChangeText={setPhone} style={styles.input} keyboardType="phone-pad" />
       <TextInput label="Email" value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
@@ -55,10 +56,11 @@ export default function CreateLeadScreen({ navigation }: any) {
       <TextInput label="City" value={city} onChangeText={setCity} style={styles.input} />
       <TextInput label="Pincode" value={pincode} onChangeText={setPincode} style={styles.input} keyboardType="numeric" />
 
-      <Button mode="contained" onPress={onCreate} loading={loading} style={{ marginTop: 12 }}>
-        Create Lead
-      </Button>
-    </ScrollView>
+        <Button mode="contained" onPress={onCreate} loading={loading} style={{ marginTop: 12, marginBottom: 24 }}>
+          Create Lead
+        </Button>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
