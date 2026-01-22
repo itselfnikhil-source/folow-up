@@ -11,7 +11,11 @@ export default function LeadsStack() {
     <Stack.Navigator>
       <Stack.Screen name="LeadsList" component={LeadsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="LeadDetail" component={LeadDetailScreen} options={{ title: 'Lead Detail' }} />
-      <Stack.Screen name="CreateLead" component={CreateLeadScreen} options={{ title: 'Create Lead' }} />
+      <Stack.Screen
+        name="CreateLead"
+        component={CreateLeadScreen}
+        options={{ title: 'Create Lead', headerStyle: { height: 56 }, headerTitleStyle: { marginTop: 0 } }}
+      />
     </Stack.Navigator>
   );
 }

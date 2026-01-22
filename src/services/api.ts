@@ -66,6 +66,11 @@ export const getCurrentUser = async () => {
   return res.data;
 };
 
+export const updateProfile = async (payload: { name?: string; email?: string }) => {
+  const res = await api.patch('/me', payload);
+  return res.data;
+};
+
 export const logout = async () => {
   await AsyncStorage.removeItem('authToken');
   await AsyncStorage.removeItem('user');
@@ -107,6 +112,11 @@ export const addLeadNote = async (leadId: number, note: { body: string }) => {
 
 export const createLeadReminder = async (leadId: number, payload: { remind_at: string; note?: string }) => {
   const res = await api.post(`/leads/${leadId}/reminders`, payload);
+  return res.data;
+};
+
+export const getLeadTypes = async () => {
+  const res = await api.get('/masters/lead-types');
   return res.data;
 };
 

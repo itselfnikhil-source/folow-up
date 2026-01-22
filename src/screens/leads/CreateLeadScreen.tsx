@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
-import { createLead } from '../../services/api';
+import { TextInput, Button, Text, Menu, ActivityIndicator } from 'react-native-paper';
+import { createLead, getLeadTypes } from '../../services/api';
 
 export default function CreateLeadScreen({ navigation }: any) {
   const [firstName, setFirstName] = useState('');
@@ -15,6 +15,14 @@ export default function CreateLeadScreen({ navigation }: any) {
   const [city, setCity] = useState('');
   const [pincode, setPincode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [leadType, setLeadType] = useState('home_loan');
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [leadTypes, setLeadTypes] = useState<Array<{ key: string; label: string }>>([
+    { key: 'home_loan', label: 'Home Loan' },
+    { key: 'car_loan', label: 'Car Loan' },
+    { key: 'personal_loan', label: 'Personal Loan' },
+  ]);
+  const [loadingTypes, setLoadingTypes] = useState(false);
 
   const onCreate = async () => {
     if (!firstName || !phone) {
@@ -28,6 +36,7 @@ export default function CreateLeadScreen({ navigation }: any) {
       const payload: any = {
         name,
         phone,
+        lead_type: leadType,
         meta: { email, price, address, country, state, city, pincode },
       };
 
@@ -40,10 +49,55 @@ export default function CreateLeadScreen({ navigation }: any) {
     }
   };
 
+  useEffect(() => {
+    let mounted = true;
+    const fetchTypes = async () => {
+      setLoadingTypes(true);
+      try {
+        const res = await getLeadTypes();
+        // Expecting array like [{ key: 'home_loan', label: 'Home Loan' }, ...] or simple strings
+        if (!mounted) return;
+        if (Array.isArray(res)) {
+          const normalized = res.map((r: any) =>
+            typeof r === 'string' ? { key: r, label: r.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) } : { key: r.key ?? r.id ?? String(r), label: r.label ?? r.name ?? String(r) }
+          );
+          setLeadTypes(normalized);
+          if (normalized.length > 0) setLeadType(normalized[0].key);
+        }
+      } catch (err) {
+        // keep defaults
+      } finally {
+        setLoadingTypes(false);
+      }
+    };
+    fetchTypes();
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 8, padding: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
         <Text style={styles.header}>Create Lead</Text>
+
+        <View style={{ marginBottom: 10 }}>
+          {loadingTypes ? (
+            <ActivityIndicator animating />
+          ) : (
+            <Menu
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={
+                <Button mode="outlined" onPress={() => setMenuVisible(true)} style={styles.input}>
+                  {leadTypes.find(t => t.key === leadType)?.label ?? leadType}
+                </Button>
+              }
+            >
+              {leadTypes.map(t => (
+                <Menu.Item key={t.key} onPress={() => { setLeadType(t.key); setMenuVisible(false); }} title={t.label} />
+              ))}
+            </Menu>
+          )}
+        </View>
 
         <TextInput label="First name" value={firstName} onChangeText={setFirstName} style={styles.input} />
       <TextInput label="Last name" value={lastName} onChangeText={setLastName} style={styles.input} />

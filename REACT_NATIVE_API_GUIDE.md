@@ -86,6 +86,19 @@ All endpoints are prefixed with `/api`. Authentication is via Bearer token (Lara
   - `deal_value` (float, optional)
   - `meta` (object, optional)
 
+### Masters
+
+#### GET `/masters/lead-types` (auth required)
+- Returns available lead types for dropdowns and filtering.
+- Response example:
+```json
+[
+  { "key": "home_loan", "label": "Home Loan" },
+  { "key": "car_loan", "label": "Car Loan" },
+  { "key": "personal_loan", "label": "Personal Loan" }
+]
+```
+
 #### GET `/leads/{lead}` (auth required)
 - Get details for a specific lead
 - Response: lead object
@@ -102,34 +115,23 @@ All endpoints are prefixed with `/api`. Authentication is via Bearer token (Lara
 - Response: `{ message }`
 - Errors: 401 (unauthenticated), 404 (not found)
 
-### Lead Activities
+### Lead Activities / Notes / Reminders
 
-These endpoints help record notes, status changes, followups and call logs for a lead.
+The app integrates with these lead-related endpoints (implemented in the RN API wrapper):
 
-#### GET `/leads/{lead}/activities` (auth required)
-- List activity entries for a lead (notes, status changes, followups, call logs)
-- Response: array of activity objects
-- Errors: 401 (unauthenticated), 404 (not found)
+#### GET `/leads/{lead}/notes` (auth required)
+- List textual notes attached to a lead
+- Response: `[{ id, body, created_by, created_at }, ...]`
 
-#### POST `/leads/{lead}/note` (auth required)
+#### POST `/leads/{lead}/notes` (auth required)
 - Add a text note to a lead
-- Body: `{ note: string }`
-- Response: created activity object
+- Body: `{ body: string }`
+- Response: created note object
 
-#### POST `/leads/{lead}/status` (auth required)
-- Change lead status
-- Body: `{ status: string }`
-- Response: created activity object
-
-#### POST `/leads/{lead}/followup` (auth required)
-- Schedule a followup for a lead
-- Body: `{ followup_at: string (ISO), note?: string }`
-- Response: created activity object
-
-#### POST `/leads/{lead}/call-log` (auth required)
-- Record a call log for a lead
-- Body: `{ duration_seconds: integer, note?: string, called_at?: string }`
-- Response: created activity object
+#### POST `/leads/{lead}/reminders` (auth required)
+- Schedule a reminder for a lead
+- Body: `{ remind_at: string (ISO), note?: string }`
+- Response: created reminder object
 
 ### Workspaces
 
@@ -148,6 +150,17 @@ These endpoints help record notes, status changes, followups and call logs for a
 - List all members of a workspace
 - Response: Array of user objects
 - Errors: 401 (unauthenticated), 404 (not found)
+
+### User Profile
+
+#### GET `/me` (auth required)
+- Get current user profile
+- Response: user object
+
+#### PATCH `/me` (auth required)
+- Update current user profile (name/email)
+- Body: `{ name?: string, email?: string }`
+- Response: updated user object
 
 #### POST `/workspaces/{workspace}/invite` (auth required)
 - Invite a user to a workspace

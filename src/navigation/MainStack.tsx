@@ -16,7 +16,11 @@ export default function MainStack() {
       <Stack.Screen name="WorkspaceDetail" component={WorkspaceDetailScreen} options={{ title: 'Workspace' }} />
       <Stack.Screen name="MemberLeads" component={MemberLeadsScreen} options={{ title: 'Member Leads' }} />
       <Stack.Screen name="LeadDetail" component={LeadDetailScreen} options={{ title: 'Lead Detail' }} />
-      <Stack.Screen name="CreateLead" component={CreateLeadScreen} options={{ title: 'Create Lead' }} />
+      <Stack.Screen
+        name="CreateLead"
+        component={CreateLeadScreen}
+        options={{ title: 'Create Lead', headerStyle: { height: 56 }, headerTitleStyle: { marginTop: 0 } }}
+      />
     </Stack.Navigator>
   );
 }
